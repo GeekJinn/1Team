@@ -12,26 +12,32 @@ def read_bboxes_from_txt(txt_file_path):
     return bboxes
 
 def convert(size, box):
-    # 원래 이미지와 조정된 이미지의 너비와 높이 비율 계산
-    ratio_w = 640 / size[0]
-    ratio_h = 640 / size[1]
+    """
+    YOLO 형식으로 바운딩 박스 좌표를 변환하여 정규화하는 함수입니다.
 
-    # 바운딩 박스의 좌표 계산
-    x_center = (box[0] + box[2]) / 2.0
-    y_center = (box[1] + box[3]) / 2.0
-    width = (box[2] - box[0]) * ratio_w
-    height = (box[3] - box[1]) * ratio_h
+    Args:
+        size (tuple): 원래 이미지의 너비와 높이 (width, height)
+        box (tuple): 바운딩 박스의 좌표 (xmin, ymin, xmax, ymax)
 
-    # YOLO 형식에 맞게 좌표 변환
-    x_center = x_center * ratio_w
-    width = width * ratio_w
-    y_center = y_center * ratio_h
-    height = height * ratio_h
-    print(x_center, y_center, width, height)
+    Returns:
+        tuple: YOLO 형식으로 변환된 바운딩 박스 좌표 및 정규화된 값 (x_center, y_center, width, height)
+    """
+    # 원래 이미지의 너비와 높이
+    original_width, original_height = size
+
+    # 640x640 해상도에 맞게 x, y 좌표 조정
+    x_center = (box[0] + box[2]) / 2.0 * (640 / original_width)
+    y_center = (box[1] + box[3]) / 2.0 * (640 / original_height)
+
+    # 바운딩 박스의 폭과 높이
+    width = (box[2] - box[0]) * (640 / original_width)
+    height = (box[3] - box[1]) * (640 / original_height)
+
+    # YOLO 형식으로 정규화된 좌표 반환
     return (x_center, y_center, width, height)
 
 # 이미지 파일과 바운딩 박스 파일이 있는 디렉토리 경로
-image_dir = 'resizing_image/train'  
+image_dir = 'data/images/train'  
 txt_dir = 'image/spoon' 
 output_dir = 'image/spoon/resize_yolo'
 
@@ -57,7 +63,6 @@ for file_name in os.listdir(image_dir):
         # 이미지 열어서 크기 가져오기
         image = Image.open(image_path)
         image_size = image.size  # 이미지 크기
-        print(image_size)
         
         # 바운딩 박스 좌표를 YOLO 형식으로 변환
         converted_bboxes = [convert(image_size, bbox) for bbox in bboxes]
@@ -69,4 +74,3 @@ for file_name in os.listdir(image_dir):
         with open(output_txt_path, 'w', encoding='utf-8') as output_file:
             for bbox in converted_bboxes:
                 output_file.write('1 ' + ' '.join([str(coord) for coord in bbox]) + '\n')
-

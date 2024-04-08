@@ -20,8 +20,8 @@ def draw_bbox(image_path, bbox):
 
 
 # 사용 예시
-image_path = 'image/627/858643_607.jpg'  # 이미지 파일 경로
-bbox = (1266, 1506, 153, 170)  # bbox 좌표 (x_min, y_min, width, height)
+image_path = 'resizing_image/train/855149_607.jpg'  # 이미지 파일 경로
+bbox = (0.28610421148414794, 0.321390552700324, 0.31924575164533786, 0.516215098703079)  # bbox 좌표 (x_min, y_min, width, height)
 
 # draw_bbox 함수 호출하여 bbox 그리고 결과를 새 창에 표시
 draw_bbox(image_path, bbox)
